@@ -4,13 +4,15 @@
 [![Debian](https://img.shields.io/badge/Debian-13-red.svg)](https://www.debian.org/)
 [![Yubikey](https://img.shields.io/badge/Yubikey-4%2F5-green.svg)](https://www.yubico.com/)
 
-Soluzione completa per risolvere i problemi di autenticazione Google con Yubikey Touch su Debian 13 e Chrome/Chromium.
+**[🇮🇹 Versione Italiana](README.it.md)** | **🇬🇧 English Version**
 
-## 🔧 Problema
+Complete solution to fix Google authentication issues with Yubikey Touch on Debian 13 and Chrome/Chromium.
 
-La Yubikey 4/5 (ID 1050:0407) non viene riconosciuta correttamente da Chrome su Debian 13 per l'autenticazione Google con FIDO2/U2F.
+## 🔧 Problem
 
-## ⚡ Installazione Rapida
+Yubikey 4/5 (ID 1050:0407) is not properly recognized by Chrome on Debian 13 for Google authentication with FIDO2/U2F.
+
+## ⚡ Quick Installation
 
 ```bash
 git clone https://github.com/yourusername/yubikey-debian-fix.git
@@ -19,75 +21,77 @@ chmod +x install.sh
 sudo ./install.sh
 ```
 
-## 📖 Documentazione
+## 📖 Documentation
 
-- [Guida Completa](docs/GUIDA_COMPLETA.md) - Guida dettagliata passo-passo
-- [Troubleshooting](docs/TROUBLESHOOTING.md) - Risoluzione problemi comuni
-- [Script Automatici](scripts/) - Script di installazione e configurazione
+- **[Complete Guide (EN)](docs/GUIDE.en.md)** - Detailed step-by-step guide
+- **[Complete Guide (IT)](docs/GUIDA_COMPLETA.md)** - Guida dettagliata passo-passo
+- **[Troubleshooting (EN)](docs/TROUBLESHOOTING.en.md)** - Common issues resolution
+- **[Troubleshooting (IT)](docs/TROUBLESHOOTING.it.md)** - Risoluzione problemi comuni
+- **[Automated Scripts](scripts/)** - Installation and configuration scripts
 
-## 🎯 Caratteristiche
+## 🎯 Features
 
-- ✅ Configurazione automatica delle regole udev
-- ✅ Installazione dei pacchetti necessari
-- ✅ Script di diagnostica
-- ✅ Supporto per Yubikey 4/5 OTP+U2F+CCID
-- ✅ Compatibile con Debian 12/13
+- ✅ Automatic udev rules configuration
+- ✅ Installation of required packages
+- ✅ Diagnostic script
+- ✅ Support for Yubikey 4/5 OTP+U2F+CCID
+- ✅ Compatible with Debian 12/13
 
-## 📋 Requisiti
+## 📋 Requirements
 
-- Debian 12 o 13
-- Chrome o Chromium
-- Yubikey 4 o 5
-- Accesso sudo
+- Debian 12 or 13
+- Chrome or Chromium
+- Yubikey 4 or 5
+- Sudo access
 
-## 🚀 Uso Manuale
+## 🚀 Manual Usage
 
-1. **Installare i pacchetti necessari:**
+1. **Install required packages:**
    ```bash
    sudo apt update
    sudo apt install libpam-u2f libfido2-1 libu2f-host0 yubikey-manager pcscd scdaemon
    ```
 
-2. **Configurare udev:**
+2. **Configure udev:**
    ```bash
    sudo cp config/70-u2f.rules /etc/udev/rules.d/
    sudo udevadm control --reload-rules
    sudo udevadm trigger
    ```
 
-3. **Aggiungere l'utente al gruppo plugdev:**
+3. **Add user to plugdev group:**
    ```bash
    sudo usermod -a -G plugdev $USER
    ```
 
-4. **Riavviare il sistema o fare logout/login**
+4. **Reboot the system or logout/login**
 
-## 🔍 Diagnostica
+## 🔍 Diagnostics
 
-Eseguire lo script di diagnostica per verificare la configurazione:
+Run the diagnostic script to verify the configuration:
 
 ```bash
 ./scripts/diagnose.sh
 ```
 
-## 🤝 Contribuire
+## 🤝 Contributing
 
-Le contribuzioni sono benvenute! Vedere [CONTRIBUTING.md](CONTRIBUTING.md) per maggiori dettagli.
+Contributions are welcome! See **[CONTRIBUTING (EN)](CONTRIBUTING.en.md)** or **[CONTRIBUTING (IT)](CONTRIBUTING.it.md)** for more details.
 
-## 📝 Licenza
+## 📝 License
 
-Questo progetto è rilasciato sotto licenza MIT. Vedere il file [LICENSE](LICENSE) per i dettagli.
+This project is released under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 👥 Autore
+## 👥 Author
 
-- Creato per la community Debian/Linux
+- Created for the Debian/Linux community
 
-## 🔗 Link Utili
+## 🔗 Useful Links
 
 - [Yubico Official Docs](https://support.yubico.com/hc/en-us)
 - [Debian Wiki - Yubikey](https://wiki.debian.org/Yubikey)
 - [Chrome U2F Support](https://support.google.com/accounts/answer/6103523)
 
-## ⭐ Supporto
+## ⭐ Support
 
-Se questo progetto ti è stato utile, considera di dargli una stella su GitHub!
+If this project was helpful to you, consider giving it a star on GitHub!

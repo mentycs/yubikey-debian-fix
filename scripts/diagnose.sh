@@ -278,7 +278,9 @@ echo "         Diagnostic Complete             "
 echo "========================================="
 echo
 echo "For additional help, see:"
-echo "- Documentation: docs/GUIDA_COMPLETA.md"
-echo "- Troubleshooting: docs/TROUBLESHOOTING.md"
+echo "- Complete Guide (EN): docs/GUIDE.en.md"
+echo "- Complete Guide (IT): docs/GUIDA_COMPLETA.md"
+echo "- Troubleshooting (EN): docs/TROUBLESHOOTING.en.md"
+echo "- Troubleshooting (IT): docs/TROUBLESHOOTING.it.md"
 echo "- Report issues: https://github.com/yourusername/yubikey-debian-fix"
 echo

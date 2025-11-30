@@ -1,5 +1,7 @@
 # Troubleshooting Guide
 
+**🇮🇹 Versione Italiana** | **[🇬🇧 English Version](TROUBLESHOOTING.en.md)**
+
 ## Problemi Comuni e Soluzioni
 
 ### 1. Chrome non rileva la Yubikey

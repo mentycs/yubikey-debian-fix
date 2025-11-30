@@ -1,70 +1,70 @@
-# Guida Completa: Yubikey su Debian 13 con Chrome
+# Complete Guide: Yubikey on Debian 13 with Chrome
 
-**🇮🇹 Versione Italiana** | **[🇬🇧 English Version](GUIDE.en.md)**
+**🇬🇧 English Version** | **[🇮🇹 Versione Italiana](GUIDA_COMPLETA.md)**
 
-## Indice
-1. [Introduzione](#introduzione)
-2. [Identificazione del Problema](#identificazione-del-problema)
-3. [Prerequisiti](#prerequisiti)
-4. [Installazione Pacchetti](#installazione-pacchetti)
-5. [Configurazione udev](#configurazione-udev)
-6. [Configurazione Permessi](#configurazione-permessi)
-7. [Gestione Servizi](#gestione-servizi)
-8. [Test e Verifica](#test-e-verifica)
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Problem Identification](#problem-identification)
+3. [Prerequisites](#prerequisites)
+4. [Package Installation](#package-installation)
+5. [udev Configuration](#udev-configuration)
+6. [Permission Configuration](#permission-configuration)
+7. [Service Management](#service-management)
+8. [Testing and Verification](#testing-and-verification)
 9. [Troubleshooting](#troubleshooting)
-10. [Configurazioni Avanzate](#configurazioni-avanzate)
+10. [Advanced Configurations](#advanced-configurations)
 
 ---
 
-## Introduzione
+## Introduction
 
-Questa guida risolve il problema comune in cui Chrome/Chromium su Debian 13 non rileva correttamente il touch sulla Yubikey per l'autenticazione Google con FIDO2/U2F.
+This guide solves the common issue where Chrome/Chromium on Debian 13 does not properly detect the Yubikey touch for Google authentication with FIDO2/U2F.
 
-### Dispositivo Interessato
+### Affected Device
 ```
 Bus 002 Device 003: ID 1050:0407 Yubico.com Yubikey 4/5 OTP+U2F+CCID
 ```
 
-## Identificazione del Problema
+## Problem Identification
 
-### Sintomi Comuni
-- Chrome non mostra la richiesta di toccare la Yubikey
-- L'autenticazione si blocca senza risposta
-- La Yubikey lampeggia ma Chrome non risponde
-- Errore "Security key not detected"
+### Common Symptoms
+- Chrome does not show the request to touch the Yubikey
+- Authentication gets stuck without response
+- Yubikey blinks but Chrome doesn't respond
+- "Security key not detected" error
 
-### Verifica Iniziale
+### Initial Verification
 ```bash
-# Verificare che la Yubikey sia riconosciuta dal sistema
+# Verify that the Yubikey is recognized by the system
 lsusb | grep Yubico
 
-# Output atteso:
+# Expected output:
 # Bus 002 Device 003: ID 1050:0407 Yubico.com Yubikey 4/5 OTP+U2F+CCID
 ```
 
-## Prerequisiti
+## Prerequisites
 
-### Requisiti di Sistema
-- Debian 13 (Trixie) o Debian 12 (Bookworm)
-- Kernel Linux 5.10 o superiore
-- Chrome/Chromium versione 90+
-- Accesso sudo/root
+### System Requirements
+- Debian 13 (Trixie) or Debian 12 (Bookworm)
+- Linux Kernel 5.10 or higher
+- Chrome/Chromium version 90+
+- Sudo/root access
 
-### Backup Configurazioni
+### Configuration Backups
 ```bash
-# Backup delle regole udev esistenti
+# Backup existing udev rules
 sudo cp -r /etc/udev/rules.d /etc/udev/rules.d.backup
 ```
 
-## Installazione Pacchetti
+## Package Installation
 
-### Pacchetti Essenziali
+### Essential Packages
 ```bash
-# Aggiornare il sistema
+# Update the system
 sudo apt update
 sudo apt upgrade
 
-# Installare i pacchetti necessari
+# Install required packages
 sudo apt install -y \
     libpam-u2f \
     libfido2-1 \
@@ -78,114 +78,114 @@ sudo apt install -y \
     pcsc-tools
 ```
 
-### Descrizione Pacchetti
-- **libpam-u2f**: Modulo PAM per autenticazione U2F
-- **libfido2-1**: Libreria per FIDO2/WebAuthn
-- **libu2f-host0**: Libreria host per U2F
-- **yubikey-manager**: Tool CLI per gestire Yubikey
-- **pcscd**: PC/SC daemon per smartcard
-- **scdaemon**: Daemon GnuPG per smartcard
+### Package Descriptions
+- **libpam-u2f**: PAM module for U2F authentication
+- **libfido2-1**: Library for FIDO2/WebAuthn
+- **libu2f-host0**: Host library for U2F
+- **yubikey-manager**: CLI tool to manage Yubikey
+- **pcscd**: PC/SC daemon for smartcards
+- **scdaemon**: GnuPG daemon for smartcards
 
-## Configurazione udev
+## udev Configuration
 
-### Creare le Regole udev
+### Create udev Rules
 
 ```bash
-# Creare il file delle regole
+# Create the rules file
 sudo vi /etc/udev/rules.d/70-u2f.rules
 ```
 
-Contenuto del file:
+File content:
 ```udev
 # Yubico Yubikey 4/5
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", TAG+="uaccess", MODE="0660", GROUP="plugdev"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", TAG+="uaccess", MODE="0660", GROUP="plugdev"
 
-# Regole aggiuntive per compatibilità completa
+# Additional rules for full compatibility
 ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", ENV{ID_SECURITY_TOKEN}="1"
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", ENV{ID_SECURITY_TOKEN}="1"
 
-# Supporto per tutti i modelli Yubikey
+# Support for all Yubikey models
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", TAG+="uaccess", MODE="0660", GROUP="plugdev"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", TAG+="uaccess", MODE="0660", GROUP="plugdev"
 ```
 
-### Applicare le Modifiche
+### Apply Changes
 ```bash
-# Ricaricare le regole udev
+# Reload udev rules
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
-# Verificare che le regole siano applicate
+# Verify that rules are applied
 udevadm test $(udevadm info -q path -n /dev/hidraw0) 2>&1 | grep "70-u2f"
 ```
 
-## Configurazione Permessi
+## Permission Configuration
 
-### Gestione Gruppi Utente
+### User Group Management
 ```bash
-# Aggiungere l'utente ai gruppi necessari
+# Add user to necessary groups
 sudo usermod -a -G plugdev $USER
-sudo usermod -a -G scard $USER  # Opzionale per smartcard
+sudo usermod -a -G scard $USER  # Optional for smartcard
 
-# Verificare i gruppi
+# Verify groups
 groups $USER
 ```
 
-### Permessi File System
+### File System Permissions
 ```bash
-# Assicurarsi che i device abbiano i permessi corretti
+# Ensure devices have correct permissions
 ls -la /dev/hidraw*
-# Dovrebbero mostrare gruppo 'plugdev' e permessi 660
+# Should show 'plugdev' group and 660 permissions
 ```
 
-## Gestione Servizi
+## Service Management
 
-### Configurazione pcscd
+### pcscd Configuration
 ```bash
-# Abilitare e avviare pcscd
+# Enable and start pcscd
 sudo systemctl enable pcscd
 sudo systemctl start pcscd
 
-# Verificare lo stato
+# Check status
 sudo systemctl status pcscd
 ```
 
-### Ottimizzazione per U2F/FIDO2
-Se si verificano conflitti con pcscd:
+### U2F/FIDO2 Optimization
+If you experience conflicts with pcscd:
 ```bash
-# Disabilitare pcscd se causa problemi con U2F
+# Disable pcscd if it causes issues with U2F
 sudo systemctl stop pcscd
 sudo systemctl disable pcscd
 
-# NOTA: Disabilitare solo se non si usa la funzionalità smartcard
+# NOTE: Disable only if not using smartcard functionality
 ```
 
-## Test e Verifica
+## Testing and Verification
 
-### Test con yubikey-manager
+### Test with yubikey-manager
 ```bash
-# Informazioni sulla Yubikey
+# Yubikey information
 ykman info
 
-# Lista delle applicazioni disponibili
+# List available applications
 ykman list
 
 # Test FIDO2
 ykman fido info
 ```
 
-### Test con Chrome
-1. Chiudere completamente Chrome:
+### Test with Chrome
+1. Close Chrome completely:
    ```bash
    pkill chrome || pkill chromium
    ```
 
-2. Riavviare Chrome e navigare su: https://webauthn.io/
+2. Restart Chrome and navigate to: https://webauthn.io/
 
-3. Testare la registrazione e l'autenticazione
+3. Test registration and authentication
 
-### Script di Test Completo
+### Complete Test Script
 ```bash
 #!/bin/bash
 echo "=== Yubikey Diagnostic Test ==="
@@ -214,12 +214,12 @@ echo -e "\n=== Test Complete ==="
 
 ## Troubleshooting
 
-### Problema: Chrome non rileva la Yubikey
+### Issue: Chrome doesn't detect the Yubikey
 
-**Soluzione 1: Reset completo**
+**Solution 1: Complete reset**
 ```bash
-# Rimuovere e reinserire la Yubikey
-# Riavviare i servizi
+# Remove and reinsert the Yubikey
+# Restart services
 sudo systemctl restart systemd-udevd
 sudo systemctl restart pcscd
 
@@ -228,60 +228,60 @@ rm -rf ~/.config/chromium/Default/Web\ Data*
 rm -rf ~/.config/google-chrome/Default/Web\ Data*
 ```
 
-**Soluzione 2: Modalità debug**
+**Solution 2: Debug mode**
 ```bash
-# Avviare Chrome con log verbose
+# Start Chrome with verbose logging
 google-chrome --enable-logging=stderr --v=1 2>&1 | grep -i "fido\|u2f\|hid"
 ```
 
-### Problema: Permessi insufficienti
+### Issue: Insufficient permissions
 
 ```bash
-# Verificare e correggere i permessi
+# Verify and fix permissions
 sudo chmod 660 /dev/hidraw*
 sudo chown root:plugdev /dev/hidraw*
 ```
 
-### Problema: Conflitto con altri servizi
+### Issue: Conflict with other services
 
 ```bash
-# Identificare processi che usano la Yubikey
+# Identify processes using the Yubikey
 sudo lsof | grep hidraw
 
-# Terminare processi conflittuali
-sudo killall gpg-agent scdaemon  # Se necessario
+# Terminate conflicting processes
+sudo killall gpg-agent scdaemon  # If necessary
 ```
 
-## Configurazioni Avanzate
+## Advanced Configurations
 
-### Configurazione per più Yubikey
+### Configuration for Multiple Yubikeys
 ```bash
-# Regole udev per multiple Yubikey
+# udev rules for multiple Yubikeys
 cat << 'EOF' | sudo tee /etc/udev/rules.d/71-yubikeys.rules
-# Supporto per multiple Yubikey simultanee
+# Support for multiple simultaneous Yubikeys
 ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0010|0110|0111|0114|0116|0401|0403|0405|0407|0410", \
     ENV{ID_SECURITY_TOKEN}="1", ENV{ID_SMARTCARD_READER}="1", \
     TAG+="uaccess", MODE="0660", GROUP="plugdev"
 EOF
 ```
 
-### Integrazione con GPG
+### GPG Integration
 ```bash
-# Configurare GPG per usare la Yubikey
+# Configure GPG to use the Yubikey
 echo "reader-port Yubico Yubikey" >> ~/.gnupg/scdaemon.conf
 gpgconf --reload scdaemon
 ```
 
-### Logging Avanzato
+### Advanced Logging
 ```bash
-# Abilitare logging dettagliato
+# Enable detailed logging
 echo "log-level debug" | sudo tee -a /etc/libccid_Info.conf
 
-# Monitor real-time
+# Real-time monitoring
 sudo journalctl -f | grep -i "yubikey\|u2f\|fido"
 ```
 
-## Script di Installazione Automatica
+## Automated Installation Script
 
 ```bash
 #!/bin/bash
@@ -312,25 +312,25 @@ sudo systemctl restart pcscd
 echo "Installation complete! Please logout and login again."
 ```
 
-## Note Finali
+## Final Notes
 
-### Sicurezza
-- Mai condividere l'output di `ykman oath accounts list`
-- Fare backup delle chiavi di recupero
-- Testare sempre la configurazione prima di affidarsi completamente
+### Security
+- Never share the output of `ykman oath accounts list`
+- Backup recovery keys
+- Always test the configuration before fully relying on it
 
-### Compatibilità Browser
-- **Chrome/Chromium**: Supporto completo
-- **Firefox**: Richiede configurazione aggiuntiva
-- **Edge**: Supporto nativo su Linux
+### Browser Compatibility
+- **Chrome/Chromium**: Full support
+- **Firefox**: Requires additional configuration
+- **Edge**: Native support on Linux
 
-### Risorse Utili
+### Useful Resources
 - [Yubico Linux Documentation](https://support.yubico.com/hc/en-us/articles/360016649039)
 - [Debian Wiki - Yubikey](https://wiki.debian.org/Yubikey)
 - [FIDO2 Project](https://fidoalliance.org/fido2/)
 
 ---
 
-**Versione**: 1.0.0  
-**Ultimo aggiornamento**: 2024  
-**Compatibilità**: Debian 12/13, Ubuntu 22.04+
+**Version**: 1.0.0
+**Last update**: 2024
+**Compatibility**: Debian 12/13, Ubuntu 22.04+

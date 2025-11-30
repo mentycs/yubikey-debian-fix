@@ -1,5 +1,7 @@
 # Contributing to Yubikey Debian Fix
 
+**🇮🇹 Versione Italiana** | **[🇬🇧 English Version](CONTRIBUTING.en.md)**
+
 Grazie per il tuo interesse nel contribuire a questo progetto! 
 
 ## Come Contribuire
