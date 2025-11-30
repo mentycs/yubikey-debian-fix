@@ -1,0 +1,34 @@
+# Yubico Yubikey 4/5 OTP+U2F+CCID Support
+# Place this file in /etc/udev/rules.d/70-u2f.rules
+
+# Main rules for Yubikey 4/5 (ID 1050:0407)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+
+# Additional compatibility rules
+ACTION=="add|change", SUBSYSTEM=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", ENV{ID_SECURITY_TOKEN}="1", ENV{ID_SMARTCARD_READER}="1"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", ENV{ID_SECURITY_TOKEN}="1"
+
+# Generic Yubikey support for all models
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+
+# Comprehensive model support
+# YubiKey 4/5 OTP+U2F+CCID
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+# YubiKey 4/5 U2F+CCID
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0405", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+# YubiKey 4/5 OTP+CCID
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0404", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+# YubiKey 4/5 CCID
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0406", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+# YubiKey 4/5 FIDO+CCID
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0402", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+# YubiKey 4/5 OTP+FIDO+CCID
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0403", TAG+="uaccess", MODE="0660", GROUP="plugdev"
+
+# Security token environment variables for all Yubico devices
+ATTRS{idVendor}=="1050", ENV{ID_SECURITY_TOKEN}="1", ENV{ID_SMARTCARD_READER}="1"
+
+# Ensure proper permissions for all Yubico HID devices
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl"

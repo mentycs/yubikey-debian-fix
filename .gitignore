@@ -1,0 +1,44 @@
+# Backup files
+*.backup
+*.bak
+*~
+.*.swp
+.*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+diagnose-*.txt
+debug-*.txt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Build artifacts
+build/
+dist/
+*.deb
+*.rpm
+
+# User-specific
+.env
+.local
+config.local
+
+# Test outputs
+test-results/
+coverage/
+
+# Documentation build
+docs/_build/
+*.pdf
